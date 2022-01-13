@@ -265,7 +265,7 @@ def Train(load = None):
                 disc_fake, indice = MinPatchPooling(out)
             else :
                 indice = None
-            print(disc_fake.shape)
+            # print(disc_fake.shape)
             #flabel = torch.full((disc_fake.size()), fake_label, dtype=disc_fake.dtype, device=device)
             rlabel = torch.full((disc_fake.size()), real_label, dtype=disc_fake.dtype, device=device)
             LI_G = loss_i(rlabel, disc_fake) # + loss_i(flabel, disc_real)
