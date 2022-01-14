@@ -73,10 +73,7 @@ def weights_init(m):
     if classname.find('BatchNorm') != -1:
         nn.init.normal_(m.weight.data, 1.0, 0.02)
         nn.init.constant_(m.bias.data, 0)
-    
-    if classname.find('Conv') != -1:
-        nn.utils.spectral_norm(m)
-        
+
 
 def conv3x3(in_channels, out_channels, stride = 1, padding = 1):
     return nn.Conv2d(in_channels, out_channels, kernel_size = 3,stride = stride, padding = padding)
@@ -182,14 +179,10 @@ def save_checkpoint(state, dirpath, epoch):
     print('--- checkpoint saved to ' + str(checkpoint_path) + ' ---')
     
 generator = Generator(ResidualBlock).to(device)
-generator.apply(weights_init)
-
 discriminator = Discriminator().to(device)
-discriminator.apply(weights_init)
 
 optimizer_G = optim.Adam(generator.parameters(), lr = lr_G, betas = (0.5,0.999))
 optimizer_D = optim.Adam(discriminator.parameters(), lr = lr_D, betas = (0.5, 0.999))
-
 
 real_label = 1.
 fake_label = 0.
@@ -243,6 +236,9 @@ def Train(load = None):
         optimizer_D.load_state_dict(dataloaded['disc_opt'])
         epoch_start = dataloaded['epoch']
         print("Checkpoint-{}.pt is loaded".format(load))
+    else :
+        discriminator.apply(weights_init)
+        generator.apply(weights_init)
         
     generator.train()
     discriminator.train()
@@ -266,14 +262,14 @@ def Train(load = None):
             fake = generator(x, y)
             #disc_real = discriminator(x, x_hat)
             out = discriminator(x, fake)
-            # disc_fake, indice = MinPatchPooling(out)
+            disc_fake, indice = MinPatchPooling(out)
             # disc_fake = out
             # disc_fake = MeanPatchPooling(out)
-            disc_fake = QuarterPatchPooling(out)
-            if len(disc_fake.flatten()) < 16 :
-                disc_fake, indice = MinPatchPooling(out)
-            else :
-                indice = None
+            # disc_fake = QuarterPatchPooling(out)
+            # if len(disc_fake.flatten()) < 16 :
+            #     disc_fake, indice = MinPatchPooling(out)
+            # else :
+            #     indice = None
             # print(disc_fake.shape)
             #flabel = torch.full((disc_fake.size()), fake_label, dtype=disc_fake.dtype, device=device)
             rlabel = torch.full((disc_fake.size()), real_label, dtype=disc_fake.dtype, device=device)
@@ -359,6 +355,6 @@ def Train(load = None):
                                    id2.detach().cpu(),
                                    output_ls1.detach().cpu(),
                                    indice)
-        cv2.imwrite("./result/reult-{}epoch.png".format(epoch + 1),result_img)
+        cv2.imwrite("./result/reult_{:03}.jpg".format(epoch + 1),result_img)
 
 Train(opt.load)
