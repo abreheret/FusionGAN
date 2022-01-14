@@ -213,6 +213,15 @@ def create_image_sample(x,y,fake,Gyy,Gxy2,id1,id2,out_ls1,indice=None) :
     result_img = utils.make_grid(sample, padding = 0,normalize = True, nrow = 8)
     result_img = result_img.mul(255).add_(0.5).clamp_(0, 255).permute(1, 2, 0).to("cpu", torch.uint8).numpy()
     result_img = cv2.cvtColor(result_img, cv2.COLOR_RGB2BGR )
+    y = 230
+    cv2.putText(result_img, '  X   ', (0*256+80,y) , cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255,255), 2, cv2.LINE_AA)
+    cv2.putText(result_img, '  Y   ', (1*256+80,y) , cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255,255), 2, cv2.LINE_AA)
+    cv2.putText(result_img, 'G(X,Y)', (2*256+80,y) , cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255,255), 2, cv2.LINE_AA)
+    cv2.putText(result_img, 'G_ls2a', (3*256+80,y) , cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255,255), 2, cv2.LINE_AA)
+    cv2.putText(result_img, 'G_ls2b', (4*256+80,y) , cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255,255), 2, cv2.LINE_AA)
+    cv2.putText(result_img, '  id1 ', (5*256+80,y) , cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255,255), 2, cv2.LINE_AA)
+    cv2.putText(result_img, '  id2 ', (6*256+80,y) , cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255,255), 2, cv2.LINE_AA)
+    cv2.putText(result_img, 'G_ls1 ', (7*256+80,y) , cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255,255), 2, cv2.LINE_AA)
     if indice is not None : 
         for i_batch in range(min(batch_size,4)):
             i_patch = indice[i_batch].detach().cpu()
